@@ -43,7 +43,7 @@ export async function searchPlayers(
   const body = await result.text();
   const $ = cheerio.load(body);
   const scrapedData = [];
-  $("#players > div.search-item > div.search-item-name > a").each(
+  $("#players > div.search-item > div.search-item-name a").each(
     (_, element) => {
       scrapedData.push({
         name: $(element).text(),
