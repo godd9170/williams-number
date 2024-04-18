@@ -40,20 +40,23 @@ export async function searchPlayers(
   const result = await fetch(
     `https://www.basketball-reference.com/search/search.fcgi?search=${search}`
   );
+  console.log("Search Response Status: ", result.status);
   const body = await result.text();
   const $ = cheerio.load(body);
   const scrapedData = [];
-  $("#players > div.search-item > div.search-item-name a").each(
-    (_, element) => {
-      scrapedData.push({
-        name: $(element).text(),
-        id: parseId($(element).attr("href")),
-      });
-    }
-  );
+  const players = $("#players > div.search-item > div.search-item-name a");
+  console.log("PLAYERS: ", players.text());
+  players.each((_, element) => {
+    scrapedData.push({
+      name: $(element).text(),
+      id: parseId($(element).attr("href")),
+    });
+  });
+
   if (scrapedData.length === 0) {
     // if there is only one result, BBR pushes directly to the profile page
     // so attempt to get as player profile instead
+    console.log("No Players: ", $("h1").text());
     scrapedData.push({
       name: $("h1 > span").text(),
       id: parseId(result.url),
