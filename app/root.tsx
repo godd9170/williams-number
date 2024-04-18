@@ -20,6 +20,13 @@ export default function Root() {
         <Links />
       </head>
       <body>
+        <h3>
+          Sadly, we're being hugged to death and hitting{" "}
+          <a href="https://www.sports-reference.com/bot-traffic.html">
+            BasketballReference's very low bot limit
+          </a>
+          . I'll try to work around this, so the people can know the truth!{" "}
+        </h3>
         <Outlet />
         <Scripts />
         <footer>
