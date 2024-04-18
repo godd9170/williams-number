@@ -13,7 +13,7 @@ RUN mkdir /app
 WORKDIR /app
 
 ADD package.json package-lock.json ./
-RUN npm install --production=false
+RUN yarn install --production=false
 
 # Setup production node_modules
 FROM base as production-deps
@@ -23,7 +23,7 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
 ADD package.json package-lock.json ./
-RUN npm prune --production
+RUN yarn prune --production
 
 # Build the app
 FROM base as build
@@ -34,7 +34,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules /app/node_modules
 
 ADD . .
-RUN npm run build
+RUN yarn run build
 
 # Finally, build the production image with minimal footprint
 FROM base
@@ -50,4 +50,4 @@ COPY --from=build /app/public /app/public
 ADD . .
 
 ENV PORT 8080
-CMD ["npm", "run", "start"]
+CMD ["yarn", "run", "start"]
