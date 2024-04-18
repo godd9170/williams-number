@@ -118,52 +118,72 @@ function handleBrowserRequest(request, responseStatusCode, responseHeaders, remi
 // app/root.tsx
 var root_exports = {};
 __export(root_exports, {
-  default: () => Root
+  default: () => Root,
+  links: () => links
 });
 import { Links, Meta, Outlet, Scripts } from "@remix-run/react";
+
+// app/root.css
+var root_default = "/build/_assets/root-J6XCAY3Q.css";
+
+// app/root.tsx
 import { jsxDEV as jsxDEV2 } from "react/jsx-dev-runtime";
+var links = () => [{ rel: "stylesheet", href: root_default }];
 function Root() {
   return /* @__PURE__ */ jsxDEV2("html", { children: [
     /* @__PURE__ */ jsxDEV2("head", { children: [
       /* @__PURE__ */ jsxDEV2("link", { rel: "icon", href: "data:image/x-icon;base64,AA" }, void 0, !1, {
         fileName: "app/root.tsx",
-        lineNumber: 8,
+        lineNumber: 13,
         columnNumber: 9
       }, this),
       /* @__PURE__ */ jsxDEV2(Meta, {}, void 0, !1, {
         fileName: "app/root.tsx",
-        lineNumber: 9,
+        lineNumber: 14,
         columnNumber: 9
       }, this),
       /* @__PURE__ */ jsxDEV2(Links, {}, void 0, !1, {
         fileName: "app/root.tsx",
-        lineNumber: 10,
-        columnNumber: 9
-      }, this)
-    ] }, void 0, !0, {
-      fileName: "app/root.tsx",
-      lineNumber: 7,
-      columnNumber: 7
-    }, this),
-    /* @__PURE__ */ jsxDEV2("body", { children: [
-      /* @__PURE__ */ jsxDEV2(Outlet, {}, void 0, !1, {
-        fileName: "app/root.tsx",
-        lineNumber: 13,
-        columnNumber: 9
-      }, this),
-      /* @__PURE__ */ jsxDEV2(Scripts, {}, void 0, !1, {
-        fileName: "app/root.tsx",
-        lineNumber: 14,
+        lineNumber: 15,
         columnNumber: 9
       }, this)
     ] }, void 0, !0, {
       fileName: "app/root.tsx",
       lineNumber: 12,
       columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV2("body", { children: [
+      /* @__PURE__ */ jsxDEV2(Outlet, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 18,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2(Scripts, {}, void 0, !1, {
+        fileName: "app/root.tsx",
+        lineNumber: 19,
+        columnNumber: 9
+      }, this),
+      /* @__PURE__ */ jsxDEV2("footer", { children: [
+        "All data provided by",
+        " ",
+        /* @__PURE__ */ jsxDEV2("a", { href: "https://www.basketball-reference.com/", children: "BasketballReference.com" }, void 0, !1, {
+          fileName: "app/root.tsx",
+          lineNumber: 22,
+          columnNumber: 11
+        }, this)
+      ] }, void 0, !0, {
+        fileName: "app/root.tsx",
+        lineNumber: 20,
+        columnNumber: 9
+      }, this)
+    ] }, void 0, !0, {
+      fileName: "app/root.tsx",
+      lineNumber: 17,
+      columnNumber: 7
     }, this)
   ] }, void 0, !0, {
     fileName: "app/root.tsx",
-    lineNumber: 6,
+    lineNumber: 11,
     columnNumber: 5
   }, this);
 }
@@ -175,7 +195,7 @@ __export(playerId_exports, {
   loader: () => loader
 });
 import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 
 // app/services/basketball-reference.server.ts
 import fetch from "node-fetch";
@@ -189,22 +209,63 @@ async function getWilliams(playerId) {
     /williams/i.test(name) && scrapedData.push(name);
   }), scrapedData;
 }
+function parseId(url) {
+  let regex = /\/players\/[a-z]\/([a-z]+[0-9]+)\.html/, match = url.match(regex);
+  return match ? match[1] : "";
+}
+async function searchPlayers(search) {
+  if (search === "")
+    return [];
+  let body = await (await fetch(
+    `https://www.basketball-reference.com/search/search.fcgi?search=${search}`
+  )).text(), $ = cheerio.load(body), scrapedData = [];
+  return $("#players > div.search-item > div.search-item-name > a").each(
+    (_, element) => {
+      scrapedData.push({
+        name: $(element).text(),
+        id: parseId($(element).attr("href"))
+      });
+    }
+  ), scrapedData;
+}
+async function getPlayer(id) {
+  let body = await (await fetch(
+    `https://www.basketball-reference.com/players/${id[0]}/${id}.html`
+  )).text();
+  return await cheerio.load(body)("h1 > span").text();
+}
 
 // app/routes/$playerId.tsx
 import { jsxDEV as jsxDEV3 } from "react/jsx-dev-runtime";
 var loader = async ({ params, request }) => {
-  let williams = await getWilliams(params.playerId || "");
-  return json({ williams });
+  let williams = await getWilliams(params.playerId || ""), name = await getPlayer(params.playerId || "");
+  return json({ williams, name });
 };
 function Player() {
-  let { williams } = useLoaderData();
-  return /* @__PURE__ */ jsxDEV3("ol", { children: williams.map((x) => /* @__PURE__ */ jsxDEV3("li", { children: x }, void 0, !1, {
+  let { williams, name } = useLoaderData();
+  return /* @__PURE__ */ jsxDEV3("div", { className: "container", children: [
+    /* @__PURE__ */ jsxDEV3("h1", { children: `${name} has played with ${williams.length} Williams` }, void 0, !1, {
+      fileName: "app/routes/$playerId.tsx",
+      lineNumber: 20,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV3("ol", { children: williams.map((x) => /* @__PURE__ */ jsxDEV3("li", { children: x }, x, !1, {
+      fileName: "app/routes/$playerId.tsx",
+      lineNumber: 23,
+      columnNumber: 11
+    }, this)) }, void 0, !1, {
+      fileName: "app/routes/$playerId.tsx",
+      lineNumber: 21,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV3(Link, { to: "/", children: "Check Another Player's Williams Number" }, void 0, !1, {
+      fileName: "app/routes/$playerId.tsx",
+      lineNumber: 26,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, !0, {
     fileName: "app/routes/$playerId.tsx",
-    lineNumber: 17,
-    columnNumber: 9
-  }, this)) }, void 0, !1, {
-    fileName: "app/routes/$playerId.tsx",
-    lineNumber: 15,
+    lineNumber: 19,
     columnNumber: 5
   }, this);
 }
@@ -212,24 +273,72 @@ function Player() {
 // app/routes/_index.tsx
 var index_exports = {};
 __export(index_exports, {
-  default: () => Index
+  default: () => Index,
+  loader: () => loader2
 });
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
+import { json as json2 } from "@remix-run/node";
+import { Link as Link2, useFetcher } from "@remix-run/react";
 import { jsxDEV as jsxDEV4 } from "react/jsx-dev-runtime";
+var loader2 = async ({ params, request }) => {
+  let url = new URL(request.url), search = new URLSearchParams(url.search), results = await searchPlayers(search.get("search") || "");
+  return json2({ results });
+};
 function Index() {
-  return /* @__PURE__ */ jsxDEV4("div", { children: /* @__PURE__ */ jsxDEV4(Link, { to: "griffbl01", children: "Search Player " }, void 0, !1, {
+  let fetcher = useFetcher(), [query, setQuery] = useState(""), debouncedQuery = useDebounce(query, 300);
+  return useEffect(() => {
+    debouncedQuery.length <= 2 || fetcher.submit({ search: debouncedQuery });
+  }, [debouncedQuery]), /* @__PURE__ */ jsxDEV4("div", { className: "container", children: [
+    /* @__PURE__ */ jsxDEV4("h1", { children: "How many Williams?" }, void 0, !1, {
+      fileName: "app/routes/_index.tsx",
+      lineNumber: 26,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV4(fetcher.Form, { children: /* @__PURE__ */ jsxDEV4(
+      "input",
+      {
+        type: "search",
+        name: "search",
+        placeholder: "Search NBA Player",
+        value: query,
+        onChange: (event) => setQuery(event.currentTarget.value)
+      },
+      void 0,
+      !1,
+      {
+        fileName: "app/routes/_index.tsx",
+        lineNumber: 28,
+        columnNumber: 9
+      },
+      this
+    ) }, void 0, !1, {
+      fileName: "app/routes/_index.tsx",
+      lineNumber: 27,
+      columnNumber: 7
+    }, this),
+    /* @__PURE__ */ jsxDEV4("ul", { children: fetcher.data ? fetcher.data.results.map(({ name, id }) => /* @__PURE__ */ jsxDEV4("li", { children: /* @__PURE__ */ jsxDEV4(Link2, { to: `/${id}`, children: name }, void 0, !1, {
+      fileName: "app/routes/_index.tsx",
+      lineNumber: 40,
+      columnNumber: 17
+    }, this) }, id, !1, {
+      fileName: "app/routes/_index.tsx",
+      lineNumber: 39,
+      columnNumber: 15
+    }, this)) : null }, void 0, !1, {
+      fileName: "app/routes/_index.tsx",
+      lineNumber: 36,
+      columnNumber: 7
+    }, this)
+  ] }, void 0, !0, {
     fileName: "app/routes/_index.tsx",
-    lineNumber: 7,
-    columnNumber: 7
-  }, this) }, void 0, !1, {
-    fileName: "app/routes/_index.tsx",
-    lineNumber: 6,
+    lineNumber: 25,
     columnNumber: 5
   }, this);
 }
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
-var assets_manifest_default = { entry: { module: "/build/entry.client-IVGM44UF.js", imports: ["/build/_shared/chunk-ZWGWGGVF.js", "/build/_shared/chunk-UF7ZFYU2.js", "/build/_shared/chunk-TDW3H5SW.js", "/build/_shared/chunk-N2V7NJQ7.js", "/build/_shared/chunk-XU7DNSPJ.js", "/build/_shared/chunk-GIAAE3CH.js", "/build/_shared/chunk-BOXFZXVX.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-PU4DT6FN.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/$playerId": { id: "routes/$playerId", parentId: "root", path: ":playerId", index: void 0, caseSensitive: void 0, module: "/build/routes/$playerId-R543VGUL.js", imports: void 0, hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-56GJ4CAY.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "d7696871", hmr: { runtime: "/build/_shared/chunk-N2V7NJQ7.js", timestamp: 1713407512753 }, url: "/build/manifest-D7696871.js" };
+var assets_manifest_default = { entry: { module: "/build/entry.client-WFNIR5NE.js", imports: ["/build/_shared/chunk-ZWGWGGVF.js", "/build/_shared/chunk-AHZ4XQ6R.js", "/build/_shared/chunk-N2V7NJQ7.js", "/build/_shared/chunk-XU7DNSPJ.js", "/build/_shared/chunk-GIAAE3CH.js", "/build/_shared/chunk-BOXFZXVX.js", "/build/_shared/chunk-UWV35TSL.js", "/build/_shared/chunk-PNG5AS42.js"] }, routes: { root: { id: "root", parentId: void 0, path: "", index: void 0, caseSensitive: void 0, module: "/build/root-NU7DQIW2.js", imports: void 0, hasAction: !1, hasLoader: !1, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/$playerId": { id: "routes/$playerId", parentId: "root", path: ":playerId", index: void 0, caseSensitive: void 0, module: "/build/routes/$playerId-CYROIKRA.js", imports: ["/build/_shared/chunk-QQ7U4RXJ.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 }, "routes/_index": { id: "routes/_index", parentId: "root", path: void 0, index: !0, caseSensitive: void 0, module: "/build/routes/_index-4GP5RLAV.js", imports: ["/build/_shared/chunk-QQ7U4RXJ.js"], hasAction: !1, hasLoader: !0, hasClientAction: !1, hasClientLoader: !1, hasErrorBoundary: !1 } }, version: "1ffbf56e", hmr: { runtime: "/build/_shared/chunk-N2V7NJQ7.js", timestamp: 1713412300174 }, url: "/build/manifest-1FFBF56E.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var mode = "development", assetsBuildDirectory = "public/build", future = { v3_fetcherPersist: !1, v3_relativeSplatPath: !1, v3_throwAbortReason: !1 }, publicPath = "/build/", entry = { module: entry_server_node_exports }, routes = {
