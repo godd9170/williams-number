@@ -4,53 +4,39 @@
 #
 
 app = 'williams-number'
-primary_region = 'yyz'
-kill_signal = 'SIGINT'
-kill_timeout = '5s'
-
-[experimental]
-  cmd = ['start.sh']
-  entrypoint = ['sh']
-  auto_rollback = true
-
-[build]
+kill_signal = "SIGINT"
+kill_timeout = 5
+primary_region = "yyz"
+processes = []
 
 [env]
-  PORT = '8080'
+PORT = "8080"
 
-[http_service]
-  internal_port = 3000
-  force_https = true
-  auto_stop_machines = true
-  auto_start_machines = true
-  min_machines_running = 0
-  processes = ['app']
+[experimental]
+auto_rollback = true
 
 [[services]]
-  protocol = 'tcp'
-  internal_port = 8080
-  processes = ['app']
+http_checks = []
+internal_port = 8080
+processes = ["app"]
+protocol = "tcp"
+script_checks = []
+[services.concurrency]
+hard_limit = 25
+soft_limit = 20
+type = "connections"
 
-  [[services.ports]]
-    port = 80
-    handlers = ['http']
-    force_https = true
+[[services.ports]]
+force_https = true
+handlers = ["http"]
+port = 80
 
-  [[services.ports]]
-    port = 443
-    handlers = ['tls', 'http']
+[[services.ports]]
+handlers = ["tls", "http"]
+port = 443
 
-  [services.concurrency]
-    type = 'connections'
-    hard_limit = 25
-    soft_limit = 20
-
-  [[services.tcp_checks]]
-    interval = '15s'
-    timeout = '2s'
-    grace_period = '1s'
-
-[[vm]]
-  memory = '1gb'
-  cpu_kind = 'shared'
-  cpus = 1
+[[services.tcp_checks]]
+grace_period = "1s"
+interval = "15s"
+restart_limit = 0
+timeout = "2s"
