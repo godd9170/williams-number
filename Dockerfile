@@ -23,7 +23,6 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules /app/node_modules
 ADD package.json ./
-RUN yarn prune --production
 
 # Build the app
 FROM base as build
