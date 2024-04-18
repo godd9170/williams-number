@@ -1,5 +1,6 @@
 html, body {
     height: 100%;
+    background-color: whitesmoke;
   }
 
 body {
@@ -14,6 +15,7 @@ body {
     flex-direction: column;
     align-items: center;
     flex: 1 0 auto;
+    padding: 0 24px
 }
 
 h1 {
@@ -25,7 +27,8 @@ form {
 }
 
 input {
-    width: 100%
+    width: 100%;
+    height: 45px;
 }
 
 footer {
