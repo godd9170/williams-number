@@ -51,6 +51,14 @@ export async function searchPlayers(
       });
     }
   );
+  if (scrapedData.length === 0) {
+    // if there is only one result, BBR pushes directly to the profile page
+    // so attempt to get as player profile instead
+    scrapedData.push({
+      name: $("h1 > span").text(),
+      id: parseId(result.url),
+    });
+  }
   return scrapedData;
 }
 
